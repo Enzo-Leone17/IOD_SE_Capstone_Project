@@ -68,9 +68,9 @@ module.exports = {
         return res.status(200).json(JSON.parse(cached));
       }
 
-      const { count, rows: medias } = await Location.findAndCountAll({
+      const { count, rows: medias } = await Media.findAndCountAll({
         where: filterQuery,
-        order: [[sortBy, sortOrder]],
+        order: [[sortBy ? sortBy : "id", sortOrder ? sortOrder : "ASC"]],
         limit,
         offset,
       });

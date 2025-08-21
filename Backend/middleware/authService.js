@@ -3,6 +3,9 @@ const jwt = require('jsonwebtoken');
 //env
 require('dotenv').config();
 
+//blacklist token check
+const { isTokenBlacklisted } = require("./cacheService");
+
 /**
  * use JWT to sign a token
  * @param {*} payload an object with user information. e.g user id

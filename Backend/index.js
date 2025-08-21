@@ -14,9 +14,12 @@ const db = require("./models");
 // Middleware
 const rateLimiter = require("./middleware/rateLimiter");
 const authLimiter = rateLimiter(20, 60);
+const apiLimiter = rateLimiter(40, 60);
+const { authService } = require("./middleware/authService");
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+app.use("/api/wellmesh", apiLimiter)
 
 
 // Routes
@@ -28,12 +31,12 @@ const locationRoutes = require("./routes/location.routes");
 const mediaRoutes = require("./routes/media.routes");
 
 //listen to routes
-app.use("/api/wellmesh/users", userRoutes);
+app.use("/api/wellmesh/users", authService, userRoutes);
 app.use("/api/wellmesh/auth", authLimiter, authRoutes);
-app.use("/api/wellmesh/events", eventRoutes);
-app.use("/api/wellmesh/activities", activityRoutes);
-app.use("/api/wellmesh/locations", locationRoutes);
-app.use("/api/wellmesh/medias", mediaRoutes);
+app.use("/api/wellmesh/events", authService,  eventRoutes);
+app.use("/api/wellmesh/activities", authService, activityRoutes);
+app.use("/api/wellmesh/locations", authService, locationRoutes);
+app.use("/api/wellmesh/medias", authService, mediaRoutes);
 
 
 // Connect to DB

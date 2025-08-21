@@ -76,7 +76,7 @@ module.exports = {
 
       const { count, rows: locations } = await Location.findAndCountAll({
         where: filterQuery,
-        order: [[sortBy, sortOrder]],
+        order: [[sortBy ? sortBy : "id", sortOrder ? sortOrder : "ASC"]],
         limit,
         offset,
       });

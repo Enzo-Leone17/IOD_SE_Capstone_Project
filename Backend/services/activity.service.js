@@ -77,7 +77,7 @@ module.exports = {
         return res.status(200).json(JSON.parse(cached));
       }
 
-      const { count, rows: activities } = await Activity.findAll({
+      const { count, rows: activities } = await Activity.findAndCountAll({
         where: filterQuery,
         include: [
           {
