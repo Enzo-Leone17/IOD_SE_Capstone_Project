@@ -36,9 +36,9 @@ module.exports = {
         type: Sequelize.STRING,
       },
       role: {
-        type: Sequelize.ENUM("admin", "manager", "staff"),
+        type: Sequelize.ENUM("admin", "manager", "staff", "guest"),
         allowNull: false,
-        defaultValue: "staff",
+        defaultValue: "guest",
       },
       is_verified: {
         type: Sequelize.BOOLEAN,

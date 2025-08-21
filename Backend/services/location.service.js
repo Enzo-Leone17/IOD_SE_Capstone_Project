@@ -48,17 +48,19 @@ module.exports = {
       const sortBy = req.query.sortBy;
       const sortOrder = req.query.sortOrder?.toUpperCase();
       const validQuery = ["id", "name", "address", "booking_cost", "url"];
-      if (validQuery.includes(sortBy)) {
-        filterQuery[sortBy] = sortOrder;
+      if (sortBy && !validQuery.includes(sortBy)) {
+        return res.status(400).json({ error: "Invalid sort field" });
+      } else if (sortOrder && !["ASC", "DESC"].includes(sortOrder)) {
+        return res.status(400).json({ error: "Invalid sort order" });
       }
 
       //search
       const search = req.query.search;
       if (search) {
         filterQuery[Op.or] = [
-          { name: { [Op.iLike]: `%${search}%` } },
-          { address: { [Op.iLike]: `%${search}%` } },
-          { booking_cost: { [Op.iLike]: `%${search}%` } },
+          { name: { [Op.like]: `%${search}%` } },
+          { address: { [Op.like]: `%${search}%` } },
+          { booking_cost: { [Op.like]: `%${search}%` } },
         ];
       }
 
@@ -151,21 +153,23 @@ module.exports = {
         "max_capacity",
         "additional_fee",
       ];
-      if (sortBy && validQuery.includes(sortBy)) {
-        filterQuery[sortBy] = sortOrder === "ASC" ? "ASC" : "DESC";
+      if (sortBy && !validQuery.includes(sortBy)) {
+        return res.status(400).json({ error: "Invalid sort field" });
+      } else if (sortOrder && !["ASC", "DESC"].includes(sortOrder)) {
+        return res.status(400).json({ error: "Invalid sort order" });
       }
 
       //search
       const search = req.query.search;
       if (search) {
         filterQuery[Op.or] = [
-          { title: { [Op.iLike]: `%${search}%` } },
-          { description: { [Op.iLike]: `%${search}%` } },
-          { date: { [Op.iLike]: `%${search}%` } },
-          { budget: { [Op.iLike]: `%${search}%` } },
-          { available_pax: { [Op.iLike]: `%${search}%` } },
-          { max_capacity: { [Op.iLike]: `%${search}%` } },
-          { additional_fee: { [Op.iLike]: `%${search}%` } },
+          { title: { [Op.like]: `%${search}%` } },
+          { description: { [Op.like]: `%${search}%` } },
+          { date: { [Op.like]: `%${search}%` } },
+          { budget: { [Op.like]: `%${search}%` } },
+          { available_pax: { [Op.like]: `%${search}%` } },
+          { max_capacity: { [Op.like]: `%${search}%` } },
+          { additional_fee: { [Op.like]: `%${search}%` } },
         ];
       }
 

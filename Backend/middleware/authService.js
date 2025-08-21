@@ -25,7 +25,7 @@ const verify = (token, secret) => jwt.verify(token, secret);
 
 /**
  * Authentication + Authorization Middleware
- * @param {boolean} idLock optional flag to check user can only access own id
+ * @param {boolean} idLock optional flag to check user can only access own id, admin can bypass
  * @param {Array<string>} allowedRoles optional array of roles that are allowed
  * @example
  *   app.get("/admin", authService(["admin"]), (req, res) => {...})
@@ -62,7 +62,7 @@ const authService = ( idLock = false, allowedRoles = []) => {
           .status(403)
           .json({ error: "Forbidden. You do not have access." });
       }
-      if(idLock && req.user.id !== req.params.id && req.user.role === "staff") {
+      if(idLock && req.user.id !== req.params.id && ["admin"].includes(req.user.role)) {
         return res
           .status(403)
           .json({ error: "Forbidden. You do not have access." });

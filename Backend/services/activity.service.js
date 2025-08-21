@@ -50,8 +50,10 @@ module.exports = {
         "additional_notes",
         "category",
       ];
-      if (sortBy && validQuery.includes(sortBy)) {
-        filterQuery[sortBy] = sortOrder === "ASC" ? "ASC" : "DESC";
+      if (sortBy && !validQuery.includes(sortBy)) {
+        return res.status(400).json({ error: "Invalid sort field" });
+      } else if (sortOrder && !["ASC", "DESC"].includes(sortOrder)) {
+        return res.status(400).json({ error: "Invalid sort order" });
       }
 
       //search

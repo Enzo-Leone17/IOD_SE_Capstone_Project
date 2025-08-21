@@ -207,7 +207,7 @@ module.exports = {
       if (!stored) throw new Error("Refresh token not found");
 
       //blacklist accessToken
-      await setCacheData(`blacklist:${token}`, "blacklisted", 3600);
+      await setCacheData(`blacklist:${token}`, "true", 3600);
 
       //delete refresh token
       await RefreshToken.destroy({ where: { token: refreshToken } });

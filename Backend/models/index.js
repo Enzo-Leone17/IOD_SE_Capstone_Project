@@ -48,7 +48,7 @@ db.Activity.belongsToMany(db.Event, { through: db.Event_Activity, foreignKey: "a
 
 //events and user(host)
 db.User.hasMany(db.Event, { foreignKey: "host_user_id" });
-db.Event.belongsTo(db.User, { foreignKey: "host_user_id"});
+db.Event.belongsTo(db.User, { foreignKey: "host_user_id", as: "host"});
 
 //events and user(participant) via registration
 db.User.hasMany(db.Registration, { foreignKey: "user_id" });

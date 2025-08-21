@@ -9,7 +9,7 @@ const {
   Media,
   Registration,
 } = require("../models");
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 
 //cache middleware
 const {
@@ -73,21 +73,22 @@ module.exports = {
         "max_capacity",
         "additional_fee",
       ];
-      if (sortBy && validQuery.includes(sortBy)) {
-        filterQuery[sortBy] = sortOrder === "ASC" ? "ASC" : "DESC";
+      if (sortBy && !validQuery.includes(sortBy)) {
+        return res.status(400).json({ error: "Invalid sort field" });
+      } else if (sortOrder && !["ASC", "DESC"].includes(sortOrder)) {
+        return res.status(400).json({ error: "Invalid sort order" });
       }
-
       //search
       const search = req.query.search;
       if (search) {
         filterQuery[Op.or] = [
-          { title: { [Op.iLike]: `%${search}%` } },
-          { description: { [Op.iLike]: `%${search}%` } },
-          { date: { [Op.iLike]: `%${search}%` } },
-          { budget: { [Op.iLike]: `%${search}%` } },
-          { available_pax: { [Op.iLike]: `%${search}%` } },
-          { max_capacity: { [Op.iLike]: `%${search}%` } },
-          { additional_fee: { [Op.iLike]: `%${search}%` } },
+          { title: { [Op.like]: `%${search}%` } },
+          { description: { [Op.like]: `%${search}%` } },
+          { date: { [Op.like]: `%${search}%` } },
+          { budget: { [Op.like]: `%${search}%` } },
+          { available_pax: { [Op.like]: `%${search}%` } },
+          { max_capacity: { [Op.like]: `%${search}%` } },
+          { additional_fee: { [Op.like]: `%${search}%` } },
         ];
       }
 
@@ -108,6 +109,12 @@ module.exports = {
         where: filterQuery,
         order: [[sortBy ? sortBy : "id", sortOrder ? sortOrder : "ASC"]],
         include: [
+          {
+            model: User,
+            as: "host",
+            where: { is_deleted: false },
+            required: false,
+          },
           {
             model: Activity,
             where: { is_deleted: false },

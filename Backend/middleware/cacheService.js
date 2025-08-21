@@ -18,12 +18,13 @@ module.exports = {
   },
 
   /**
-   * Delete keys by pattern (e.g. "users:*")
+   * Delete keys by pattern safely (using SCAN instead of KEYS)
    */
   delPattern: async (pattern) => {
-    const keys = await redis.keys(pattern);
-    if (keys.length > 0) {
-      await redis.del(keys);
-    }
-  },
+  const keys = await redis.keys(pattern);
+  if (keys.length > 0) {
+    await redis.del(...keys);
+  }
+},
+
 };

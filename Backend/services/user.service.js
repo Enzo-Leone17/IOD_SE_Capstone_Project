@@ -216,6 +216,7 @@ module.exports = {
     const role = req?.body?.role || null;
     const phone = req?.body?.phone || null;
     const image_url = req?.body?.image_url || null;
+    const secret_code = req?.body?.secret_code || null;
     try {
       //required fields
       if (!email) {
@@ -224,8 +225,19 @@ module.exports = {
         throw new Error("Username is required");
       } else if (!password) {
         throw new Error("Password is required");
-      } else if (!role || !["admin", "staff", "manager"].includes(role)) {
+      } else if (!role || !["admin", "staff", "manager", "guest"].includes(role)) {
         throw new Error("Valid Role is required");
+      }
+
+      //validate role and secret code
+      if (role === "admin" && secret_code !== process.env.COMPANY_ADMIN_SECRET) {
+        throw new Error("Invalid Secret Code");
+      }
+      else if (role === "staff" && secret_code !== process.env.COMPANY_SIGNUP_SECRET) {
+        throw new Error("Invalid Secret Code");
+      }
+      else if (role === "manager" && secret_code !== process.env.COMPANY_MANAGEMENT_SECRET) {
+        throw new Error("Invalid Secret Code");
       }
 
       //check for uniqueness
@@ -256,7 +268,7 @@ module.exports = {
 
       //once successful, create verification token and setcache
       const verifyToken = uuid();
-      setCacheData(`verify:${verifyToken}`, user.id, 86400); // 24h expiry
+      await setCacheData(`verify:${verifyToken}`, String(user.id), 86400); // 24h expiry
 
       //set verification url
       const verifyUrl = `http://localhost:${
@@ -404,6 +416,7 @@ module.exports = {
       "oldPassword",
       "image_url",
       "role",
+      "secret_code",
     ];
     try {
       const { id } = req.params;
@@ -438,11 +451,22 @@ module.exports = {
       }
       if (
         matchingProperties.includes("role") &&
-        ["admin", "manager", "staff"].includes(req.body.role)
+        ["admin", "manager", "staff"].includes(req.body.role) &&
+        hasUser.role !== req.body.role &&
+        matchingProperties.includes("secret_code")
       ) {
+        if(req.body.role === "admin" && req.body.secret_code !== process.env.COMPANY_ADMIN_SECRET){
+          return res.status(400).json({ error: "Invalid admin secret code" });
+        }
+        else if(req.body.role === "manager" && req.body.secret_code !== process.env.COMPANY_MANAGEMENT_SECRET){
+          return res.status(400).json({ error: "Invalid manager secret code" });
+        }
+        else if (req.body.role === "staff" && req.body.secret_code !== process.env.COMPANY_SIGNUP_SECRET){
+          return res.status(400).json({ error: "Invalid staff secret code" });
+        }
         newBody.role = req.body.role;
       }
-      if (matchingProperties.includes("username")) {
+      if (matchingProperties.includes("username") && hasUser.username !== req.body.username) {
         const existingUsername = await User.findOne(
           { where: { username: req.body.username } },
           { transaction: t }
@@ -453,7 +477,7 @@ module.exports = {
           newBody.username = req.body.username;
         }
       }
-      if (matchingProperties.includes("email")) {
+      if (matchingProperties.includes("email") && hasUser.email !== req.body.email) {
         const existingEmail = await User.findOne(
           { where: { email: req.body.email } },
           { transaction: t }

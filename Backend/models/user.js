@@ -12,9 +12,9 @@ module.exports = (sequelize, DataTypes) => {
       image_url: DataTypes.STRING,
       phone: DataTypes.STRING,
       role: {
-        type: DataTypes.ENUM("admin", "manager", "staff"),
+        type: DataTypes.ENUM("admin", "manager", "staff", "guest"),
         allowNull: false,
-        defaultValue: "staff",
+        defaultValue: "guest",
       },
       is_verified: { type: DataTypes.BOOLEAN, defaultValue: false },
       is_deleted: { type: DataTypes.BOOLEAN, defaultValue: false },

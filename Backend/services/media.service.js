@@ -43,16 +43,18 @@ module.exports = {
       const sortBy = req.query.sortBy;
       const sortOrder = req.query.sortOrder?.toUpperCase();
       const validQuery = ["id", "activity_id", "type", "url"];
-      if (validQuery.includes(sortBy)) {
-        filterQuery[sortBy] = sortOrder;
+      if (sortBy && !validQuery.includes(sortBy)) {
+        return res.status(400).json({ error: "Invalid sort field" });
+      } else if (sortOrder && !["ASC", "DESC"].includes(sortOrder)) {
+        return res.status(400).json({ error: "Invalid sort order" });
       }
 
       //search
       const search = req.query.search;
       if (search) {
         filterQuery[Op.or] = [
-          { activity_id: { [Op.iLike]: `%${search}%` } },
-          { type: { [Op.iLike]: `%${search}%` } },
+          { activity_id: { [Op.like]: `%${search}%` } },
+          { type: { [Op.like]: `%${search}%` } },
         ];
       }
 
@@ -70,6 +72,12 @@ module.exports = {
 
       const { count, rows: medias } = await Media.findAndCountAll({
         where: filterQuery,
+        include:[
+          {
+            model: Activity,
+            attributes: ["id", "title", "description"],
+          }
+        ],
         order: [[sortBy ? sortBy : "id", sortOrder ? sortOrder : "ASC"]],
         limit,
         offset,

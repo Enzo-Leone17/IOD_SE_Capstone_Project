@@ -9,8 +9,8 @@ const { authService } = require("../middleware/authService");
 //routes endpoint
 router.get("/", authService(false, ["admin","manager"]), userController.findAll);
 router.get("/:id", authService(true), userController.findOne);
-router.post("/create", authService(false, ["admin","manager"]), userController.create);
-router.post("/:id/register_event", authService(true), userController.registerEvent);
+router.post("/create", userController.create);
+router.post("/:id/register_event", authService(true, ["admin","manager", "staff"]), userController.registerEvent);
 router.put("/update/:id", authService(true), userController.update);
 router.put("/remove/:id", authService(false, ["admin","manager"]), userController.delete);
 
