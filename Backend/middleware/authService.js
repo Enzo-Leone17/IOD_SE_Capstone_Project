@@ -62,7 +62,7 @@ const authService = ( idLock = false, allowedRoles = []) => {
           .status(403)
           .json({ error: "Forbidden. You do not have access." });
       }
-      if(idLock && req.user.id !== req.params.id && ["admin"].includes(req.user.role)) {
+      if(idLock && req.user.id !== Number(req.params.id) && !req.user.role.includes("admin")) {
         return res
           .status(403)
           .json({ error: "Forbidden. You do not have access." });

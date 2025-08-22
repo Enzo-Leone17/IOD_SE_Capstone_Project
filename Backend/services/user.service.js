@@ -16,7 +16,7 @@ const {
 } = require("../middleware/cacheService");
 
 //email middleware
-const { sendEventRegistrationEmail } = require("../middleware/emailService");
+const { sendVerificationEmail ,sendEventRegistrationEmail } = require("../middleware/emailService");
 
 module.exports = {
   //#region find all users
@@ -172,6 +172,12 @@ module.exports = {
       const { count, rows: registrations } = await Registration.findAndCountAll(
         {
           where: filterQuery,
+          include: [
+            {
+              model: Event,
+              attributes: ["id","title", "date"],
+            }
+          ],
           order: [[sortBy ? sortBy : "id", sortOrder ? sortOrder : "ASC"]],
           limit,
           offset,
@@ -271,9 +277,14 @@ module.exports = {
       await setCacheData(`verify:${verifyToken}`, String(user.id), 86400); // 24h expiry
 
       //set verification url
-      const verifyUrl = `http://localhost:${
-        process.env.PORT || 8000
-      }/api/wellmesh/auth/verify-email?token=${verifyToken}`;
+      // const verifyUrl = `http://localhost:${
+      //   process.env.PORT || 8000
+      // }/api/wellmesh/auth/verify-email?token=${verifyToken}`;
+
+      const frontendVerifyUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/verify?token=${verifyToken}`;
+
+      //send verification email
+      await sendVerificationEmail(email, frontendVerifyUrl);
 
       //delete users cache
       await delPattern("users:*");
@@ -282,8 +293,6 @@ module.exports = {
       await t.commit();
       res.status(201).json({
         message: "Account created. Check your email to verify.",
-        verifyUrl,
-        email,
       });
     } catch (err) {
       await t.rollback();

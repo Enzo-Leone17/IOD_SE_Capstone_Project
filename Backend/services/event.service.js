@@ -623,9 +623,9 @@ module.exports = {
       );
 
       //update dependencies
-      await Event_Activity.destroy(
-        { where: { event_id: id } },
-        { transaction: t }
+      await Event_Activity.update(
+        { is_deleted: true },
+        { where: { event_id: id } ,transaction: t }
       );
 
       //registrations affected
