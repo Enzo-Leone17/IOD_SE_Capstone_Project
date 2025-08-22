@@ -79,10 +79,8 @@ export default function Activities({ endpoint, sortByParams }: CardListProps) {
   const fetchItems = async () => {
     setLoading(true);
     try {
-      const params: Record<string, any> = { page, limit, sortBy, sortOrder };
-      if (search) params.search = search;
 
-      const res = await api.get(endpoint, { params });
+      const res = await api.get(endpoint, { params: { page, limit, sortBy, sortOrder, search } });
       setItems(res.data.activities);
       setTotalPages(res.data.totalPages || 1);
     } catch (err) {
