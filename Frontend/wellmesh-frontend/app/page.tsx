@@ -12,11 +12,11 @@ export default function HomePage() {
       {/* 🔹 Hero Section */}
       <section className="relative h-[80vh] flex items-center justify-center text-center text-white">
         <Image
-          src="https://placehold.co/600x400"
-          alt="Luxury Hotel"
+          src="https://cdn.pixabay.com/photo/2017/01/02/21/22/hands-1947915_1280.jpg"
+          alt="Zen Life"
           layout="fill"
           objectFit="cover"
-          className="absolute inset-0 z-0"
+          className="absolute inset-0 z-1"
         />
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
         <div className="relative z-10 max-w-2xl px-6">
