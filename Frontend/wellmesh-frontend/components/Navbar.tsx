@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import Image from "next/image";
+
 
 type NavbarProps = {
   onMenuClick?: () => void; // for dashboard sidebar
@@ -28,10 +30,13 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
             </button>
           )}
 
+          <>
           {/* Logo */}
+          <Image src="/WellMesh_logoV2.png" alt="Logo" width={50} height={50} />
           <Link href="/" className="text-2xl font-bold text-blue-600">
             WellMesh
           </Link>
+          </>
         </div>
 
         {/* Desktop Nav */}
